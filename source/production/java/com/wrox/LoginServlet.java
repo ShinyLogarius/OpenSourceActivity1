@@ -1,3 +1,6 @@
+//THOMAS NEUMANN
+//3-21-19
+
 package com.wrox;
 
 
@@ -10,6 +13,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Map;
+import java.sql.*;
 
 @WebServlet(
         name = "loginServlet",
@@ -20,16 +24,31 @@ public class LoginServlet extends HttpServlet
     private static final Map<String, String> userDatabase = new Hashtable<>();
 
     static {
-        userDatabase.put("Nicholas", "password");
+        /*userDatabase.put("Nicholas", "password");
         userDatabase.put("Sarah", "drowssap");
         userDatabase.put("Mike", "wordpass");
-        userDatabase.put("John", "green");
+        userDatabase.put("John", "green");*/
+    	try {
+    		Class.forName("com.mysql.jdbc.Driver");  
+    		Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/customersupport","root","password");
+    		
+    		Statement stmt=con.createStatement();  
+    		ResultSet rs=stmt.executeQuery("select * from User");  
+    		while(rs.next()) {
+    			userDatabase.put(rs.getString(2), rs.getString(5));
+    		}
+    		con.close();
+    	}
+    	catch(Exception e){ System.out.println(e);}  
+    	
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
+    	
+    	
         HttpSession session = request.getSession();
         if(request.getParameter("logout") != null)
         {
@@ -52,6 +71,9 @@ public class LoginServlet extends HttpServlet
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
+    	
+
+    	
         HttpSession session = request.getSession();
         if(session.getAttribute("username") != null)
         {
@@ -77,3 +99,6 @@ public class LoginServlet extends HttpServlet
         }
     }
 }
+
+
+
